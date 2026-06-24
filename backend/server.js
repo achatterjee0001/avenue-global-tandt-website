@@ -11,24 +11,37 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Enable CORS
+// 1. Add ALL frontend URLs that are allowed to talk to this backend
 const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:3000',
-  'https://avenueglobaltourandtravels.vercel.app'
+  'http://localhost:5173',                         // Local Vite Dev
+  'http://localhost:3000',                         // Local Create React App Dev
+  'https://avenueglobaltourandtravels.vercel.app', // Your old Vercel URL (if still used)
+  'https://your-new-edited-domain.vercel.app'      // <--- ADD YOUR NEW EDITED VERCEL DOMAIN HERE
 ];
 
+// 2. Configure CORS
 app.use(cors({
   origin: function (origin, callback) {
+    // Allow server-to-server requests or tools like Postman (which don't send an origin header)
     if (!origin) return callback(null, true);
-    if (process.env.NODE_ENV === 'development' || allowedOrigins.indexOf(origin) !== -1) {
+    
+    // Allow if it matches our whitelist OR if we are explicitly running locally
+    if (allowedOrigins.indexOf(origin) !== -1 || origin.startsWith('http://localhost:')) {
       return callback(null, true);
     }
-    const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+    
+    const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
     return callback(new Error(msg), false);
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-inferred-preferences', 'x-location-country', 'x-preferred-max-price']
+  allowedHeaders: [
+    'Content-Type', 
+    'Authorization', 
+    'x-inferred-preferences', 
+    'x-location-country', 
+    'x-preferred-max-price'
+  ],
+  credentials: true // Highly recommended for sessions/cookies down the line
 }));
 
 // Body parsing middleware
