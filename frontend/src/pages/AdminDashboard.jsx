@@ -711,35 +711,6 @@ export default function AdminDashboard() {
                   </span>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     <div>
-                      <label className="block text-[9px] text-brand-textSecondary uppercase mb-1">Days</label>
-                      <input
-                        type="number"
-                        required
-                        min="1"
-                        value={pkgFormData.days}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          const d = val !== '' ? Number(val) : '';
-                          const n = pkgFormData.nights !== '' ? Number(pkgFormData.nights) : 0;
-                          const rD = pkgFormData.ratePerDay !== '' ? Number(pkgFormData.ratePerDay) : 0;
-                          const rN = pkgFormData.ratePerNight !== '' ? Number(pkgFormData.ratePerNight) : 0;
-                          
-                          let price = pkgFormData.price;
-                          if (rD > 0 || rN > 0) {
-                            price = (Number(d || 0) * rD) + (n * rN);
-                          }
-                          
-                          setPkgFormData({
-                            ...pkgFormData,
-                            days: val,
-                            price: price,
-                            duration: d !== '' ? `${d} Days / ${n} Nights` : pkgFormData.duration
-                          });
-                        }}
-                        className="w-full bg-brand-dark/50 border border-brand-border/60 rounded-xl py-2.5 px-3 text-xs text-brand-textPrimary focus:outline-none focus:border-brand-primary transition-all"
-                      />
-                    </div>
-                    <div>
                       <label className="block text-[9px] text-brand-textSecondary uppercase mb-1">Nights</label>
                       <input
                         type="number"
@@ -762,35 +733,36 @@ export default function AdminDashboard() {
                             ...pkgFormData,
                             nights: val,
                             price: price,
-                            duration: n !== '' ? `${d} Days / ${n} Nights` : pkgFormData.duration
+                            duration: n !== '' ? `${n} Nights / ${d} Days` : pkgFormData.duration
                           });
                         }}
                         className="w-full bg-brand-dark/50 border border-brand-border/60 rounded-xl py-2.5 px-3 text-xs text-brand-textPrimary focus:outline-none focus:border-brand-primary transition-all"
                       />
                     </div>
                     <div>
-                      <label className="block text-[9px] text-brand-textSecondary uppercase mb-1">Rate / Day (₹)</label>
+                      <label className="block text-[9px] text-brand-textSecondary uppercase mb-1">Days</label>
                       <input
                         type="number"
                         required
-                        min="0"
-                        value={pkgFormData.ratePerDay}
+                        min="1"
+                        value={pkgFormData.days}
                         onChange={(e) => {
                           const val = e.target.value;
-                          const d = pkgFormData.days !== '' ? Number(pkgFormData.days) : 1;
+                          const d = val !== '' ? Number(val) : '';
                           const n = pkgFormData.nights !== '' ? Number(pkgFormData.nights) : 0;
-                          const rD = val !== '' ? Number(val) : '';
+                          const rD = pkgFormData.ratePerDay !== '' ? Number(pkgFormData.ratePerDay) : 0;
                           const rN = pkgFormData.ratePerNight !== '' ? Number(pkgFormData.ratePerNight) : 0;
                           
                           let price = pkgFormData.price;
                           if (rD > 0 || rN > 0) {
-                            price = (d * Number(rD || 0)) + (n * rN);
+                            price = (Number(d || 0) * rD) + (n * rN);
                           }
                           
                           setPkgFormData({
                             ...pkgFormData,
-                            ratePerDay: val,
-                            price: price
+                            days: val,
+                            price: price,
+                            duration: d !== '' ? `${n} Nights / ${d} Days` : pkgFormData.duration
                           });
                         }}
                         className="w-full bg-brand-dark/50 border border-brand-border/60 rounded-xl py-2.5 px-3 text-xs text-brand-textPrimary focus:outline-none focus:border-brand-primary transition-all"
@@ -824,6 +796,34 @@ export default function AdminDashboard() {
                         className="w-full bg-brand-dark/50 border border-brand-border/60 rounded-xl py-2.5 px-3 text-xs text-brand-textPrimary focus:outline-none focus:border-brand-primary transition-all"
                       />
                     </div>
+                    <div>
+                      <label className="block text-[9px] text-brand-textSecondary uppercase mb-1">Rate / Day (₹)</label>
+                      <input
+                        type="number"
+                        required
+                        min="0"
+                        value={pkgFormData.ratePerDay}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          const d = pkgFormData.days !== '' ? Number(pkgFormData.days) : 1;
+                          const n = pkgFormData.nights !== '' ? Number(pkgFormData.nights) : 0;
+                          const rD = val !== '' ? Number(val) : '';
+                          const rN = pkgFormData.ratePerNight !== '' ? Number(pkgFormData.ratePerNight) : 0;
+                          
+                          let price = pkgFormData.price;
+                          if (rD > 0 || rN > 0) {
+                            price = (d * Number(rD || 0)) + (n * rN);
+                          }
+                          
+                          setPkgFormData({
+                            ...pkgFormData,
+                            ratePerDay: val,
+                            price: price
+                          });
+                        }}
+                        className="w-full bg-brand-dark/50 border border-brand-border/60 rounded-xl py-2.5 px-3 text-xs text-brand-textPrimary focus:outline-none focus:border-brand-primary transition-all"
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -843,7 +843,7 @@ export default function AdminDashboard() {
                     <label className="block text-[10px] text-brand-textSecondary uppercase mb-1">Duration Tag</label>
                     <input
                       type="text"
-                      placeholder="e.g. 5 Days / 4 Nights"
+                      placeholder="e.g. 4 Nights / 5 Days"
                       value={pkgFormData.duration}
                       onChange={(e) => setPkgFormData({ ...pkgFormData, duration: e.target.value })}
                       className="w-full bg-brand-dark/50 border border-brand-border/60 rounded-xl py-2.5 px-3 text-xs text-brand-textPrimary focus:outline-none focus:border-brand-primary transition-all"
@@ -1921,7 +1921,7 @@ export default function AdminDashboard() {
                         <span className="text-[9px] text-brand-textSecondary block uppercase font-bold">Custom Duration</span>
                         <span className="font-bold text-xs">
                           {selectedLead.metadata.bookingDetails.days !== undefined && selectedLead.metadata.bookingDetails.nights !== undefined
-                            ? `${selectedLead.metadata.bookingDetails.days} Days / ${selectedLead.metadata.bookingDetails.nights} Nights`
+                            ? `${selectedLead.metadata.bookingDetails.nights} Nights / ${selectedLead.metadata.bookingDetails.days} Days`
                             : selectedLead.packageId?.duration || 'Default duration'}
                         </span>
                       </div>

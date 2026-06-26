@@ -33,7 +33,7 @@ export default function PackageDetailModal({ pkg, onClose, onProceedBook }) {
         </button>
 
         {/* Left Side: Image & Core Details */}
-        <div className="md:w-1/3 bg-brand-dark/80 relative flex flex-col overflow-y-auto custom-scrollbar md:overflow-visible">
+        <div className="md:w-1/3 bg-brand-dark/80 relative flex flex-col overflow-y-auto custom-scrollbar">
           <div className="relative h-48 md:h-2/5 w-full shrink-0">
             <img 
               src={pkg.imageUrl || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80'} 
@@ -51,7 +51,7 @@ export default function PackageDetailModal({ pkg, onClose, onProceedBook }) {
                 <MapPin className="w-3.5 h-3.5 text-brand-secondary" /> {pkg.destination}
               </span>
               <span className="flex items-center gap-1 bg-black/40 backdrop-blur px-3 py-1.5 rounded-full border border-white/10">
-                <Clock className="w-3.5 h-3.5 text-brand-primary" /> {selectedDays} Days / {selectedNights} Nights
+                <Clock className="w-3.5 h-3.5 text-brand-primary" /> {selectedNights} Nights / {selectedDays} Days
               </span>
             </div>
 
@@ -68,27 +68,6 @@ export default function PackageDetailModal({ pkg, onClose, onProceedBook }) {
                   Customize Trip Duration
                 </label>
                 <div className="grid grid-cols-2 gap-3">
-                  {/* Days Counter */}
-                  <div className="flex items-center justify-between bg-brand-dark/65 border border-brand-border/60 rounded-xl p-2">
-                    <span className="text-xs font-bold text-gray-300 ml-2">Days</span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setSelectedDays(prev => Math.max(1, prev - 1))}
-                        className="w-7 h-7 bg-brand-surface hover:bg-brand-surface/85 border border-brand-border/60 text-white rounded-lg font-bold flex items-center justify-center transition-all"
-                      >
-                        -
-                      </button>
-                      <span className="text-sm font-bold text-white w-5 text-center">{selectedDays}</span>
-                      <button
-                        type="button"
-                        onClick={() => setSelectedDays(prev => Math.min(45, prev + 1))}
-                        className="w-7 h-7 bg-brand-surface hover:bg-brand-surface/85 border border-brand-border/60 text-white rounded-lg font-bold flex items-center justify-center transition-all"
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
                   {/* Nights Counter */}
                   <div className="flex items-center justify-between bg-brand-dark/65 border border-brand-border/60 rounded-xl p-2">
                     <span className="text-xs font-bold text-gray-300 ml-2">Nights</span>
@@ -104,6 +83,27 @@ export default function PackageDetailModal({ pkg, onClose, onProceedBook }) {
                       <button
                         type="button"
                         onClick={() => setSelectedNights(prev => Math.min(45, prev + 1))}
+                        className="w-7 h-7 bg-brand-surface hover:bg-brand-surface/85 border border-brand-border/60 text-white rounded-lg font-bold flex items-center justify-center transition-all"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                  {/* Days Counter */}
+                  <div className="flex items-center justify-between bg-brand-dark/65 border border-brand-border/60 rounded-xl p-2">
+                    <span className="text-xs font-bold text-gray-300 ml-2">Days</span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedDays(prev => Math.max(1, prev - 1))}
+                        className="w-7 h-7 bg-brand-surface hover:bg-brand-surface/85 border border-brand-border/60 text-white rounded-lg font-bold flex items-center justify-center transition-all"
+                      >
+                        -
+                      </button>
+                      <span className="text-sm font-bold text-white w-5 text-center">{selectedDays}</span>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedDays(prev => Math.min(45, prev + 1))}
                         className="w-7 h-7 bg-brand-surface hover:bg-brand-surface/85 border border-brand-border/60 text-white rounded-lg font-bold flex items-center justify-center transition-all"
                       >
                         +

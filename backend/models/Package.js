@@ -81,7 +81,7 @@ PackageSchema.pre('save', function (next) {
 
   // Construct duration label automatically
   if (this.days !== undefined && this.nights !== undefined) {
-    this.duration = `${this.days} Days / ${this.nights} Nights`;
+    this.duration = `${this.nights} Nights / ${this.days} Days`;
   }
 
   // Customizable price threshold for affordable classification
