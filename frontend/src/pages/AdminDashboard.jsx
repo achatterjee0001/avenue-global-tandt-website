@@ -86,7 +86,11 @@ export default function AdminDashboard() {
     itinerary: [],
     highlights: '',
     bookingPolicy: '',
-    cancellationPolicy: ''
+    cancellationPolicy: '',
+    days: 1,
+    nights: 0,
+    ratePerDay: 0,
+    ratePerNight: 0
   });
 
   // CRUD Hotel states
@@ -250,7 +254,11 @@ export default function AdminDashboard() {
       itinerary: [],
       highlights: '',
       bookingPolicy: '',
-      cancellationPolicy: ''
+      cancellationPolicy: '',
+      days: 1,
+      nights: 0,
+      ratePerDay: 0,
+      ratePerNight: 0
     });
     setShowPkgForm(true);
   };
@@ -268,14 +276,18 @@ export default function AdminDashboard() {
       itinerary: pkg.itinerary || [],
       highlights: pkg.highlights ? pkg.highlights.join('\n') : '',
       bookingPolicy: pkg.bookingPolicy || '',
-      cancellationPolicy: pkg.cancellationPolicy || ''
+      cancellationPolicy: pkg.cancellationPolicy || '',
+      days: pkg.days !== undefined ? pkg.days : 1,
+      nights: pkg.nights !== undefined ? pkg.nights : 0,
+      ratePerDay: pkg.ratePerDay !== undefined ? pkg.ratePerDay : 0,
+      ratePerNight: pkg.ratePerNight !== undefined ? pkg.ratePerNight : 0
     });
     setShowPkgForm(true);
   };
 
   const handlePkgFormSubmit = async (e) => {
     e.preventDefault();
-    if (!pkgFormData.title || !pkgFormData.price) return;
+    if (!pkgFormData.title || pkgFormData.price === '') return;
 
     try {
       const payload = {
@@ -692,15 +704,139 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
+                {/* Duration & Custom Rates Section */}
+                <div className="bg-brand-surface/10 p-4 rounded-xl border border-brand-border/40 space-y-3">
+                  <span className="block text-[10px] text-brand-secondary font-bold uppercase tracking-wider">
+                    Duration & Custom Pricing Rates
+                  </span>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div>
+                      <label className="block text-[9px] text-brand-textSecondary uppercase mb-1">Days</label>
+                      <input
+                        type="number"
+                        required
+                        min="1"
+                        value={pkgFormData.days}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          const d = val !== '' ? Number(val) : '';
+                          const n = pkgFormData.nights !== '' ? Number(pkgFormData.nights) : 0;
+                          const rD = pkgFormData.ratePerDay !== '' ? Number(pkgFormData.ratePerDay) : 0;
+                          const rN = pkgFormData.ratePerNight !== '' ? Number(pkgFormData.ratePerNight) : 0;
+                          
+                          let price = pkgFormData.price;
+                          if (rD > 0 || rN > 0) {
+                            price = (Number(d || 0) * rD) + (n * rN);
+                          }
+                          
+                          setPkgFormData({
+                            ...pkgFormData,
+                            days: val,
+                            price: price,
+                            duration: d !== '' ? `${d} Days / ${n} Nights` : pkgFormData.duration
+                          });
+                        }}
+                        className="w-full bg-brand-dark/50 border border-brand-border/60 rounded-xl py-2.5 px-3 text-xs text-brand-textPrimary focus:outline-none focus:border-brand-primary transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] text-brand-textSecondary uppercase mb-1">Nights</label>
+                      <input
+                        type="number"
+                        required
+                        min="0"
+                        value={pkgFormData.nights}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          const d = pkgFormData.days !== '' ? Number(pkgFormData.days) : 1;
+                          const n = val !== '' ? Number(val) : '';
+                          const rD = pkgFormData.ratePerDay !== '' ? Number(pkgFormData.ratePerDay) : 0;
+                          const rN = pkgFormData.ratePerNight !== '' ? Number(pkgFormData.ratePerNight) : 0;
+                          
+                          let price = pkgFormData.price;
+                          if (rD > 0 || rN > 0) {
+                            price = (d * rD) + (Number(n || 0) * rN);
+                          }
+                          
+                          setPkgFormData({
+                            ...pkgFormData,
+                            nights: val,
+                            price: price,
+                            duration: n !== '' ? `${d} Days / ${n} Nights` : pkgFormData.duration
+                          });
+                        }}
+                        className="w-full bg-brand-dark/50 border border-brand-border/60 rounded-xl py-2.5 px-3 text-xs text-brand-textPrimary focus:outline-none focus:border-brand-primary transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] text-brand-textSecondary uppercase mb-1">Rate / Day (₹)</label>
+                      <input
+                        type="number"
+                        required
+                        min="0"
+                        value={pkgFormData.ratePerDay}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          const d = pkgFormData.days !== '' ? Number(pkgFormData.days) : 1;
+                          const n = pkgFormData.nights !== '' ? Number(pkgFormData.nights) : 0;
+                          const rD = val !== '' ? Number(val) : '';
+                          const rN = pkgFormData.ratePerNight !== '' ? Number(pkgFormData.ratePerNight) : 0;
+                          
+                          let price = pkgFormData.price;
+                          if (rD > 0 || rN > 0) {
+                            price = (d * Number(rD || 0)) + (n * rN);
+                          }
+                          
+                          setPkgFormData({
+                            ...pkgFormData,
+                            ratePerDay: val,
+                            price: price
+                          });
+                        }}
+                        className="w-full bg-brand-dark/50 border border-brand-border/60 rounded-xl py-2.5 px-3 text-xs text-brand-textPrimary focus:outline-none focus:border-brand-primary transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] text-brand-textSecondary uppercase mb-1">Rate / Night (₹)</label>
+                      <input
+                        type="number"
+                        required
+                        min="0"
+                        value={pkgFormData.ratePerNight}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          const d = pkgFormData.days !== '' ? Number(pkgFormData.days) : 1;
+                          const n = pkgFormData.nights !== '' ? Number(pkgFormData.nights) : 0;
+                          const rD = pkgFormData.ratePerDay !== '' ? Number(pkgFormData.ratePerDay) : 0;
+                          const rN = val !== '' ? Number(val) : '';
+                          
+                          let price = pkgFormData.price;
+                          if (rD > 0 || rN > 0) {
+                            price = (d * rD) + (n * Number(rN || 0));
+                          }
+                          
+                          setPkgFormData({
+                            ...pkgFormData,
+                            ratePerNight: val,
+                            price: price
+                          });
+                        }}
+                        className="w-full bg-brand-dark/50 border border-brand-border/60 rounded-xl py-2.5 px-3 text-xs text-brand-textPrimary focus:outline-none focus:border-brand-primary transition-all"
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-[10px] text-brand-textSecondary uppercase mb-1">Price (₹)</label>
+                    <label className="block text-[10px] text-brand-textSecondary uppercase mb-1">Base Price (₹)</label>
                     <input
                       type="number"
                       required
                       value={pkgFormData.price}
                       onChange={(e) => setPkgFormData({ ...pkgFormData, price: e.target.value })}
                       className="w-full bg-brand-dark/50 border border-brand-border/60 rounded-xl py-2.5 px-3 text-xs text-brand-textPrimary focus:outline-none focus:border-brand-primary transition-all"
+                      placeholder="Base price (calculated if rates set)"
                     />
                   </div>
                   <div>
@@ -1768,6 +1904,35 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Section: Hotel stay details if present */}
+                {/* Section: Package Booking Details if present */}
+                {selectedLead.metadata?.bookingDetails && (
+                  <div>
+                    <h4 className="text-[10px] font-bold text-brand-textSecondary uppercase tracking-widest mb-2">Package Booking Details</h4>
+                    <div className="bg-brand-dark/50 border border-brand-border/40 p-4 rounded-xl grid grid-cols-2 gap-4">
+                      <div>
+                        <span className="text-[9px] text-brand-textSecondary block uppercase font-bold">Travelers</span>
+                        <span className="font-bold text-xs">{selectedLead.metadata.bookingDetails.travelers} travelers</span>
+                      </div>
+                      <div>
+                        <span className="text-[9px] text-brand-textSecondary block uppercase font-bold">Travel Date</span>
+                        <span className="font-bold text-xs">{selectedLead.metadata.bookingDetails.travelDate || 'Not specified'}</span>
+                      </div>
+                      <div>
+                        <span className="text-[9px] text-brand-textSecondary block uppercase font-bold">Custom Duration</span>
+                        <span className="font-bold text-xs">
+                          {selectedLead.metadata.bookingDetails.days !== undefined && selectedLead.metadata.bookingDetails.nights !== undefined
+                            ? `${selectedLead.metadata.bookingDetails.days} Days / ${selectedLead.metadata.bookingDetails.nights} Nights`
+                            : selectedLead.packageId?.duration || 'Default duration'}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-[9px] text-brand-textSecondary block uppercase font-bold">Estimated Total</span>
+                        <span className="font-bold text-xs text-brand-secondary">₹{selectedLead.metadata.bookingDetails.totalPrice?.toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {selectedLead.metadata?.hotelInquiry && (
                   <div>
                     <h4 className="text-[10px] font-bold text-brand-textSecondary uppercase tracking-widest mb-2">Hotel Stay Specifications</h4>

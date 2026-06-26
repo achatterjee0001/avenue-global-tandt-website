@@ -68,8 +68,8 @@ export default function Home() {
     }
   };
 
-  const handleProceedBook = (members, totalPrice) => {
-    setBookingDetails({ travelers: members, totalPrice });
+  const handleProceedBook = (members, totalPrice, customizedDays, customizedNights) => {
+    setBookingDetails({ travelers: members, totalPrice, days: customizedDays, nights: customizedNights });
     setBookingPkg(detailPkg);
     setDetailPkg(null);
   };
@@ -568,6 +568,8 @@ export default function Home() {
           pkg={bookingPkg}
           initialTravelers={bookingDetails.travelers}
           totalPrice={bookingDetails.totalPrice}
+          customizedDays={bookingDetails.days}
+          customizedNights={bookingDetails.nights}
           onClose={() => setBookingPkg(null)} 
         />
       )}

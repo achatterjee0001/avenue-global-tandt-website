@@ -27,8 +27,8 @@ export default function Catalog() {
   const [bookingDetails, setBookingDetails] = useState({ travelers: 1, totalPrice: 0 });
   const [showCustomModal, setShowCustomModal] = useState(false);
 
-  const handleProceedBook = (members, totalPrice) => {
-    setBookingDetails({ travelers: members, totalPrice });
+  const handleProceedBook = (members, totalPrice, customizedDays, customizedNights) => {
+    setBookingDetails({ travelers: members, totalPrice, days: customizedDays, nights: customizedNights });
     setBookingPkg(detailPkg);
     setDetailPkg(null);
   };
@@ -231,6 +231,8 @@ export default function Catalog() {
           pkg={bookingPkg}
           initialTravelers={bookingDetails.travelers}
           totalPrice={bookingDetails.totalPrice}
+          customizedDays={bookingDetails.days}
+          customizedNights={bookingDetails.nights}
           onClose={() => setBookingPkg(null)} 
         />
       )}

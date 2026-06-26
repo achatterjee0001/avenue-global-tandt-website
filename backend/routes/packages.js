@@ -120,17 +120,23 @@ router.post('/', auth, async (req, res) => {
     const { 
       title, description, price, duration, destination, 
       imageUrl, category, itinerary, highlights, 
-      bookingPolicy, cancellationPolicy 
+      bookingPolicy, cancellationPolicy,
+      days, nights, ratePerDay, ratePerNight
     } = req.body;
 
-    if (!title || !price) {
-      return res.status(400).json({ message: 'Title and price are required' });
+    let computedPrice = price;
+    if (ratePerDay > 0 || ratePerNight > 0) {
+      computedPrice = (Number(days || 1) * Number(ratePerDay || 0)) + (Number(nights || 0) * Number(ratePerNight || 0));
+    }
+
+    if (!title || !computedPrice) {
+      return res.status(400).json({ message: 'Title and price (or rate per day/night) are required' });
     }
 
     const newPackage = new Package({
       title,
       description,
-      price,
+      price: computedPrice,
       duration,
       destination,
       category,
@@ -138,7 +144,11 @@ router.post('/', auth, async (req, res) => {
       itinerary,
       highlights,
       bookingPolicy,
-      cancellationPolicy
+      cancellationPolicy,
+      days: Number(days || 1),
+      nights: Number(nights || 0),
+      ratePerDay: Number(ratePerDay || 0),
+      ratePerNight: Number(ratePerNight || 0)
     });
 
     const savedPackage = await newPackage.save();
@@ -156,7 +166,8 @@ router.put('/:id', auth, async (req, res) => {
     const { 
       title, description, price, duration, destination, 
       imageUrl, category, itinerary, highlights, 
-      bookingPolicy, cancellationPolicy 
+      bookingPolicy, cancellationPolicy,
+      days, nights, ratePerDay, ratePerNight
     } = req.body;
 
     let pkg = await Package.findById(req.params.id);
@@ -167,8 +178,6 @@ router.put('/:id', auth, async (req, res) => {
     // Update fields
     if (title !== undefined) pkg.title = title;
     if (description !== undefined) pkg.description = description;
-    if (price !== undefined) pkg.price = price;
-    if (duration !== undefined) pkg.duration = duration;
     if (destination !== undefined) pkg.destination = destination;
     if (category !== undefined) pkg.category = category;
     if (imageUrl !== undefined) pkg.imageUrl = imageUrl;
@@ -176,6 +185,19 @@ router.put('/:id', auth, async (req, res) => {
     if (highlights !== undefined) pkg.highlights = highlights;
     if (bookingPolicy !== undefined) pkg.bookingPolicy = bookingPolicy;
     if (cancellationPolicy !== undefined) pkg.cancellationPolicy = cancellationPolicy;
+
+    // Update duration & rates
+    if (days !== undefined) pkg.days = Number(days);
+    if (nights !== undefined) pkg.nights = Number(nights);
+    if (ratePerDay !== undefined) pkg.ratePerDay = Number(ratePerDay);
+    if (ratePerNight !== undefined) pkg.ratePerNight = Number(ratePerNight);
+
+    // Re-calculate price if rates are set
+    if (pkg.ratePerDay > 0 || pkg.ratePerNight > 0) {
+      pkg.price = (pkg.days * pkg.ratePerDay) + (pkg.nights * pkg.ratePerNight);
+    } else if (price !== undefined) {
+      pkg.price = price;
+    }
 
     const updatedPackage = await pkg.save();
     res.json(updatedPackage);

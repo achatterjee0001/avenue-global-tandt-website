@@ -2,18 +2,23 @@ import React, { useState } from 'react';
 import { X, Users, MapPin, Clock, Tag, CheckCircle, Info, FileText } from 'lucide-react';
 
 export default function PackageDetailModal({ pkg, onClose, onProceedBook }) {
-  const [members, setMembers] = useState(9);
+  const [members, setMembers] = useState(1);
+  const [selectedDays, setSelectedDays] = useState(pkg.days !== undefined ? pkg.days : 1);
+  const [selectedNights, setSelectedNights] = useState(pkg.nights !== undefined ? pkg.nights : 0);
   const [activeTab, setActiveTab] = useState('itinerary'); // 'highlights', 'itinerary', 'booking', 'cancellation'
   
   const handleMembersChange = (e) => {
     let val = parseInt(e.target.value, 10);
-    if (isNaN(val)) val = 9;
-    if (val < 9) val = 9;
-    if (val > 25) val = 25;
+    if (isNaN(val)) val = 1;
+    if (val < 1) val = 1;
+    if (val > 45) val = 45;
     setMembers(val);
   };
 
-  const totalPrice = pkg.price * members;
+  const basePrice = (pkg.ratePerDay > 0 || pkg.ratePerNight > 0)
+    ? (selectedDays * pkg.ratePerDay) + (selectedNights * pkg.ratePerNight)
+    : pkg.price;
+  const totalPrice = basePrice * members;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fadeIn">
@@ -46,7 +51,7 @@ export default function PackageDetailModal({ pkg, onClose, onProceedBook }) {
                 <MapPin className="w-3.5 h-3.5 text-brand-secondary" /> {pkg.destination}
               </span>
               <span className="flex items-center gap-1 bg-black/40 backdrop-blur px-3 py-1.5 rounded-full border border-white/10">
-                <Clock className="w-3.5 h-3.5 text-brand-primary" /> {pkg.duration}
+                <Clock className="w-3.5 h-3.5 text-brand-primary" /> {selectedDays} Days / {selectedNights} Nights
               </span>
             </div>
 
@@ -55,38 +60,103 @@ export default function PackageDetailModal({ pkg, onClose, onProceedBook }) {
             </p>
 
             {/* Price Configurator */}
-            <div className="mt-auto bg-brand-surface/60 backdrop-blur-md border border-brand-border/60 rounded-2xl p-5 shadow-lg">
-              <label className="block text-xs font-bold text-brand-textSecondary uppercase tracking-wider mb-3">
-                Configure Group Size (Min 9, Max 25)
-              </label>
-              <div className="flex items-center gap-4 mb-4">
-                <div className="relative w-1/2">
-                  <Users className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-textSecondary" />
-                  <input
-                    type="number"
-                    min="9"
-                    max="25"
-                    value={members}
-                    onChange={(e) => setMembers(parseInt(e.target.value) || 9)}
-                    onBlur={handleMembersChange}
-                    className="w-full bg-brand-dark border border-brand-border/60 rounded-xl py-3 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-brand-primary transition-all font-bold"
-                  />
-                </div>
-                <div className="w-1/2 text-right">
-                  <div className="text-[10px] text-brand-textSecondary uppercase font-bold tracking-wider mb-1">Total Price</div>
-                  <div className="text-2xl font-extrabold text-brand-secondary">
-                    ₹{totalPrice.toLocaleString()}
+            <div className="mt-auto bg-brand-surface/60 backdrop-blur-md border border-brand-border/60 rounded-2xl p-5 shadow-lg space-y-4">
+              
+              {/* Customize Duration */}
+              <div className="border-b border-brand-border/40 pb-4">
+                <label className="block text-xs font-bold text-brand-textSecondary uppercase tracking-wider mb-2">
+                  Customize Trip Duration
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Days Counter */}
+                  <div className="flex items-center justify-between bg-brand-dark/65 border border-brand-border/60 rounded-xl p-2">
+                    <span className="text-xs font-bold text-gray-300 ml-2">Days</span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedDays(prev => Math.max(1, prev - 1))}
+                        className="w-7 h-7 bg-brand-surface hover:bg-brand-surface/85 border border-brand-border/60 text-white rounded-lg font-bold flex items-center justify-center transition-all"
+                      >
+                        -
+                      </button>
+                      <span className="text-sm font-bold text-white w-5 text-center">{selectedDays}</span>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedDays(prev => Math.min(45, prev + 1))}
+                        className="w-7 h-7 bg-brand-surface hover:bg-brand-surface/85 border border-brand-border/60 text-white rounded-lg font-bold flex items-center justify-center transition-all"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                  {/* Nights Counter */}
+                  <div className="flex items-center justify-between bg-brand-dark/65 border border-brand-border/60 rounded-xl p-2">
+                    <span className="text-xs font-bold text-gray-300 ml-2">Nights</span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedNights(prev => Math.max(0, prev - 1))}
+                        className="w-7 h-7 bg-brand-surface hover:bg-brand-surface/85 border border-brand-border/60 text-white rounded-lg font-bold flex items-center justify-center transition-all"
+                      >
+                        -
+                      </button>
+                      <span className="text-sm font-bold text-white w-5 text-center">{selectedNights}</span>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedNights(prev => Math.min(45, prev + 1))}
+                        className="w-7 h-7 bg-brand-surface hover:bg-brand-surface/85 border border-brand-border/60 text-white rounded-lg font-bold flex items-center justify-center transition-all"
+                      >
+                        +
+                      </button>
+                    </div>
                   </div>
                 </div>
+                {(pkg.ratePerDay > 0 || pkg.ratePerNight > 0) ? (
+                  <div className="text-[10px] text-brand-primary mt-1.5 font-semibold text-center">
+                    Rates: ₹{pkg.ratePerDay}/day &bull; ₹{pkg.ratePerNight}/night
+                  </div>
+                ) : (
+                  <div className="text-[10px] text-amber-400/80 mt-1.5 font-semibold text-center">
+                    Fixed price package (custom duration rates not set by admin)
+                  </div>
+                )}
               </div>
-              
-              <button
-                onClick={() => onProceedBook(members, totalPrice)}
-                className="w-full py-3.5 bg-brand-primary hover:bg-brand-primaryHover text-white font-bold rounded-xl transition-all shadow-md hover:shadow-brand-primary/20 flex items-center justify-center gap-2"
-              >
-                <span>Proceed to Booking</span>
-                <CheckCircle className="w-4 h-4" />
-              </button>
+
+              {/* Group Size Configurator */}
+              <div>
+                <label className="block text-xs font-bold text-brand-textSecondary uppercase tracking-wider mb-2">
+                  Configure Group Size (Min 1, Max 45)
+                </label>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="relative w-1/2">
+                    <Users className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-textSecondary" />
+                    <input
+                      type="number"
+                      min="1"
+                      max="45"
+                      value={members}
+                      onChange={(e) => setMembers(parseInt(e.target.value) || 1)}
+                      onBlur={handleMembersChange}
+                      className="w-full bg-brand-dark border border-brand-border/60 rounded-xl py-3 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-brand-primary transition-all font-bold"
+                    />
+                  </div>
+                  <div className="w-1/2 text-right">
+                    <div className="text-[10px] text-brand-textSecondary uppercase font-bold tracking-wider mb-1">Total Price</div>
+                    <div className="text-2xl font-extrabold text-brand-secondary">
+                      ₹{totalPrice.toLocaleString()}
+                    </div>
+                  </div>
+                </div>
+                
+                <button
+                  onClick={() => onProceedBook(members, totalPrice, selectedDays, selectedNights)}
+                  className="w-full py-3.5 bg-brand-primary hover:bg-brand-primaryHover text-white font-bold rounded-xl transition-all shadow-md hover:shadow-brand-primary/20 flex items-center justify-center gap-2"
+                >
+                  <span>Proceed to Booking</span>
+                  <CheckCircle className="w-4 h-4" />
+                </button>
+              </div>
+
             </div>
           </div>
         </div>

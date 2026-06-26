@@ -18,6 +18,22 @@ const PackageSchema = new mongoose.Schema({
     type: String,
     default: 'N/A', // e.g. "5 Days / 4 Nights"
   },
+  days: {
+    type: Number,
+    default: 1,
+  },
+  nights: {
+    type: Number,
+    default: 0,
+  },
+  ratePerDay: {
+    type: Number,
+    default: 0,
+  },
+  ratePerNight: {
+    type: Number,
+    default: 0,
+  },
   destination: {
     type: String,
     default: 'General',
@@ -56,8 +72,18 @@ const PackageSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Pre-save middleware to dynamically determine isAffordable
+// Pre-save middleware to dynamically determine price, duration & isAffordable
 PackageSchema.pre('save', function (next) {
+  // If ratePerDay or ratePerNight is configured, compute the base package price dynamically
+  if (this.ratePerDay > 0 || this.ratePerNight > 0) {
+    this.price = (this.days * this.ratePerDay) + (this.nights * this.ratePerNight);
+  }
+
+  // Construct duration label automatically
+  if (this.days !== undefined && this.nights !== undefined) {
+    this.duration = `${this.days} Days / ${this.nights} Nights`;
+  }
+
   // Customizable price threshold for affordable classification
   const affordableBaseline = Number(process.env.AFFORDABLE_BASELINE_PRICE) || 1500;
   this.isAffordable = this.price < affordableBaseline;

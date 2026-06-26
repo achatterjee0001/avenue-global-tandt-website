@@ -28,23 +28,8 @@ const BookingQuerySchema = new mongoose.Schema({
     default: false,
   },
   metadata: {
-    location: {
-      type: Map,
-      of: mongoose.Schema.Types.Mixed,
-      default: {}
-    },
-    browserData: {
-      type: String,
-      default: 'Unknown Browser / OS',
-    },
-    sessionDurationMs: {
-      type: Number,
-      default: 0,
-    },
-    inferredPreferences: {
-      type: [String],
-      default: []
-    }
+    type: mongoose.Schema.Types.Mixed,
+    default: {}
   },
   createdAt: {
     type: Date,

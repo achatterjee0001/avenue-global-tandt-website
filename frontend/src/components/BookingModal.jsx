@@ -3,7 +3,7 @@ import { X, Calendar, Users, Mail, Phone, User, CheckCircle2 } from 'lucide-reac
 import { getTelemetryPayload } from '../utils/telemetry';
 import api from '../utils/api';
 
-export default function BookingModal({ pkg, onClose, initialTravelers = 1, totalPrice = 0 }) {
+export default function BookingModal({ pkg, onClose, initialTravelers = 1, totalPrice = 0, customizedDays, customizedNights }) {
   const [step, setStep] = useState(1);
   const [travelers, setTravelers] = useState(initialTravelers);
   const [travelDate, setTravelDate] = useState('');
@@ -13,6 +13,13 @@ export default function BookingModal({ pkg, onClose, initialTravelers = 1, total
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+
+  const days = customizedDays !== undefined ? customizedDays : (pkg.days || 1);
+  const nights = customizedNights !== undefined ? customizedNights : (pkg.nights || 0);
+  const basePrice = (pkg.ratePerDay > 0 || pkg.ratePerNight > 0)
+    ? (days * pkg.ratePerDay) + (nights * pkg.ratePerNight)
+    : pkg.price;
+  const currentTotalPrice = basePrice * Number(travelers || 0);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,9 +45,11 @@ export default function BookingModal({ pkg, onClose, initialTravelers = 1, total
           ...telemetry,
           // Append explicit booking preferences
           bookingDetails: {
-            travelers,
+            travelers: Number(travelers),
             travelDate,
-            totalPrice: totalPrice || pkg.price * travelers
+            totalPrice: currentTotalPrice,
+            days,
+            nights
           }
         }
       };
@@ -81,8 +90,8 @@ export default function BookingModal({ pkg, onClose, initialTravelers = 1, total
             </h2>
             <p className="text-sm text-brand-textSecondary mb-6">
               Selected Package: <span className="text-brand-secondary font-semibold">{pkg.title}</span>
-              {totalPrice > 0 && (
-                <span className="block mt-1">Total Estimated Price: <span className="text-brand-primary">₹{totalPrice.toLocaleString()}</span></span>
+              {currentTotalPrice > 0 && (
+                <span className="block mt-1">Total Estimated Price: <span className="text-brand-primary">₹{currentTotalPrice.toLocaleString()}</span></span>
               )}
             </p>
 
@@ -113,7 +122,7 @@ export default function BookingModal({ pkg, onClose, initialTravelers = 1, total
                         <input
                           type="number"
                           min="1"
-                          max="20"
+                          max="45"
                           value={travelers}
                           onChange={(e) => setTravelers(e.target.value)}
                           className="w-full bg-brand-dark/50 border border-brand-border/60 rounded-xl py-3 pl-11 pr-4 text-sm text-brand-textPrimary focus:outline-none focus:border-brand-primary transition-all"
