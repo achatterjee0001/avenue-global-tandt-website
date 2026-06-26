@@ -237,7 +237,10 @@ export default function Home() {
                 <Sparkles className="w-3.5 h-3.5" />
                 <span>Explore India</span>
               </span>
-              <h2 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 tracking-tight drop-shadow-md">
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white mb-2 tracking-tight drop-shadow-md">
+                Welcome to Avenue Global Tour and Travels
+              </h1>
+              <h2 className="text-xl md:text-3xl text-brand-secondary font-bold mb-4 tracking-tight drop-shadow-md">
                 {slide.title}
               </h2>
               <p className="text-gray-200 text-sm md:text-lg max-w-xl mb-8 leading-relaxed font-light drop-shadow">

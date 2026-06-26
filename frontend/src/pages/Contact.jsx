@@ -76,7 +76,7 @@ export default function Contact() {
       {/* Header */}
       <div className="mb-12 text-center max-w-2xl mx-auto">
         <h1 className="text-3xl md:text-5xl font-extrabold text-brand-textPrimary mb-2 glow-text-primary">
-          Contact Our Team
+          Contact Avenue Global Tour and Travels
         </h1>
         <p className="text-brand-textSecondary text-sm">
           Have questions about a holiday package or want to customize an itinerary? Reach out directly, and our agents will respond shortly.
